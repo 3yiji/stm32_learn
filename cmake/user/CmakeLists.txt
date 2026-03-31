@@ -1,0 +1,19 @@
+set(USER_Include_Dirs
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Hardware/Inc/
+
+)
+
+set(USER_Application_Src
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Hardware/Src/delay.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Hardware/Src/led.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Hardware/Src/sys.c
+
+)
+
+target_include_directories(stm32cubemx INTERFACE ${USER_Include_Dirs})
+
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    ${USER_Application_Src}
+)
