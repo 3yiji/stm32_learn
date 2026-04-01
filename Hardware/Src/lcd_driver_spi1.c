@@ -44,20 +44,20 @@ void SPI1_Init(void)
 //SPI1底层驱动，时钟使能，引脚配置
 //此函数会被HAL_SPI_Init()调用
 //hspi:SPI句柄
-void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
-{
-    GPIO_InitTypeDef GPIO_Initure;
+// void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
+// {
+//     GPIO_InitTypeDef GPIO_Initure;
     
-    __HAL_RCC_GPIOA_CLK_ENABLE();       //使能GPIOA时钟
-    __HAL_RCC_SPI1_CLK_ENABLE();        //使能SPI1时钟
+//     __HAL_RCC_GPIOA_CLK_ENABLE();       //使能GPIOA时钟
+//     __HAL_RCC_SPI1_CLK_ENABLE();        //使能SPI1时钟
     
-    //PA5,6,7
-    GPIO_Initure.Pin=GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
-    GPIO_Initure.Mode=GPIO_MODE_AF_PP;              //复用推挽输出
-    GPIO_Initure.Pull=GPIO_PULLUP;                  //上拉
-    GPIO_Initure.Speed=GPIO_SPEED_FREQ_HIGH;        //快速            
-    HAL_GPIO_Init(GPIOA,&GPIO_Initure);
-}
+//     //PA5,6,7
+//     GPIO_Initure.Pin=GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
+//     GPIO_Initure.Mode=GPIO_MODE_AF_PP;              //复用推挽输出
+//     GPIO_Initure.Pull=GPIO_PULLUP;                  //上拉
+//     GPIO_Initure.Speed=GPIO_SPEED_FREQ_HIGH;        //快速            
+//     HAL_GPIO_Init(GPIOA,&GPIO_Initure);
+// }
 
 //SPI速度设置函数
 //SPI速度=fAPB1/分频系数
@@ -123,11 +123,13 @@ void LCD_WR_REG(u8 REG)
 //data:要写入的值
 void LCD_WR_DATA(u16 DATA)
 {	
+    u8 tx = (u8)DATA;
+
 	LCD_CS = 0;
 	
 	LCD_RS = 1;
 	
-	HAL_SPI_Transmit(&SPI1_Handler, &(u8)DATA, 1, 100);
+    HAL_SPI_Transmit(&SPI1_Handler, &tx, 1, 100);
 	LCD_CS=1;
 }		
 
@@ -136,10 +138,12 @@ void LCD_WR_DATA(u16 DATA)
 //RGB_Code:颜色值
 void LCD_WriteRAM(u16 DAT)
 {		
+    u8 tx = (u8)DAT;
+
 	LCD_CS = 0;
 	
 	LCD_RS = 1;
 	
-	HAL_SPI_Transmit(&SPI1_Handler, &(u8)DAT, 1, 100);
+    HAL_SPI_Transmit(&SPI1_Handler, &tx, 1, 100);
 	LCD_CS=1;
 }

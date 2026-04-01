@@ -55,8 +55,8 @@
 #define INCLUDE_xTaskGetCurrentTaskHandle           1                           // 使能xTaskGetCurrentTaskHandle接口
 #define INCLUDE_uxTaskGetStackHighWaterMark         1                           // 使能栈剩余水位查询接口
 
-#define vPortSVCHandler                             SVC_Handler                 // FreeRTOS SVC中断服务函数映射到CMSIS名称
-#define xPortPendSVHandler                          PendSV_Handler              // FreeRTOS PendSV中断服务函数映射到CMSIS名称
-#define xPortSysTickHandler                         SysTick_Handler             // FreeRTOS SysTick中断服务函数映射到CMSIS名称
+// #define vPortSVCHandler                             SVC_Handler                 // FreeRTOS SVC中断服务函数映射到CMSIS名称
+// #define xPortPendSVHandler                          PendSV_Handler              // FreeRTOS PendSV中断服务函数映射到CMSIS名称
+// #define xPortSysTickHandler                         SysTick_Handler             // FreeRTOS SysTick中断服务函数映射到CMSIS名称
 
 #endif
