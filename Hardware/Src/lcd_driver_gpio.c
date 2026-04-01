@@ -2,13 +2,13 @@
 #include "sys.h"
 
 //-----------------LCD端口定义---------------- 
-#define	LCD_RESET PAout(0)	 //LCD复位    		 PA0
-#define	LCD_BL    PBout(1)   //LCD背光    		 PB1 	    
+#define	LCD_BL    PBout(1)   //LCD背光    		 PB1
 
+#define	LCD_RESET PAout(0)	 //LCD复位    		 PA0
 #define	LCD_CS	PAout(1)  //片选端口  	     PA1
 #define	LCD_RS	PAout(2)  //数据/命令        PA2	   
-#define	LCD_SCL	PAout(3)  //写数据			 PA3
-#define	LCD_SDA	PAout(4)  //读数据			 PA4
+#define	LCD_SCL	PAout(3)  //时钟			 PA3
+#define	LCD_SDA	PAout(4)  //写数据			 PA4
 //#define LCD_SDO PCin(0)   //PC0    SDO
 
 void LCD_Driver_Init(void){
