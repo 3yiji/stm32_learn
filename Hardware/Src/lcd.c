@@ -330,7 +330,8 @@ void LCD_Init(void){
 
 	// 设置显示方向（0°旋转，RGB顺序）
 	LCD_WR_REG(0x36);
-	LCD_WR_DATA(0x48);  // 具体值参考MADCTL寄存器定义
+	// LCD_WR_DATA(0x48);  // 具体值参考MADCTL寄存器定义
+	LCD_WR_DATA(0x80);  // 具体值参考MADCTL寄存器定义
 
 	// 开启显示
 	LCD_WR_REG(0x29);
