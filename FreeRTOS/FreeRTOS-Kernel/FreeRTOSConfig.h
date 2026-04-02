@@ -13,7 +13,7 @@
 #define configTICK_RATE_HZ                          1000U                       // 系统节拍1kHz，即1ms一次tick中断
 #define configMAX_PRIORITIES                        8                           // 可用任务优先级数量（0~7）
 #define configMINIMAL_STACK_SIZE                    128U                        // 空闲任务最小栈深度（单位：word，不是字节）
-#define configTOTAL_HEAP_SIZE                       (15U * 1024U)               // heap_4可用堆大小，单位字节
+#define configTOTAL_HEAP_SIZE                       (16U * 1024U)               // heap_4可用堆大小，单位字节
 #define configMAX_TASK_NAME_LEN                     16                          // 任务名最大长度（含结尾\0）
 #define configTIMER_TASK_PRIORITY                   (configMAX_PRIORITIES - 1)  // 软件定时器服务任务优先级
 #define configTIMER_QUEUE_LENGTH                    10                          // 软件定时器命令队列长度

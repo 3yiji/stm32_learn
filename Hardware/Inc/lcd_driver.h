@@ -11,4 +11,6 @@ void LCD_WR_REG(u8 REG);
 void LCD_WR_DATA(u16 DATA);
 
 void LCD_Reset(u8 state);
+
+void LCD_WR_DATA_buffer(u8 * pDATA, uint32_t size);
 #endif

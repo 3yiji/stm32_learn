@@ -65,7 +65,6 @@ void LCD_Scan_Dir(u8 dir)
 {
 	u16 regval=0;
 	u8 dirreg=0;
-	u16 temp;  
 	switch(dir)//方向转换
 	{
 		case 0:dir=6;break;
@@ -156,10 +155,10 @@ void LCD_Display_Dir(u8 dir)
 	} 
 	LCD_Scan_Dir(DFT_SCAN_DIR);	//默认扫描方向
 }
-//初始化lcd
-//该初始化函数可以初始化各种ILI93XX液晶,但是其他函数是基于ILI9320的!!!
-//在其他型号的驱动芯片上没有测试! 
-void LCD_Init(void)
+// 初始化lcd
+// 该初始化函数可以初始化各种ILI93XX液晶,但是其他函数是基于ILI9320的!!!
+// 在其他型号的驱动芯片上没有测试! 
+void LCD_Init2(void)
 { 										  
 	// GPIO_InitTypeDef GPIO_InitStructure;
 	// RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB,ENABLE);//使能PORTA A B
@@ -177,7 +176,7 @@ void LCD_Init(void)
 
 	LCD_Driver_Init();		// 驱动层初始化，设置引脚模式
 
-  	//LCD复位 
+	//LCD复位（上电后给足稳定时间，避免偶发初始化失败）
 	LCD_Reset(1);
 	delay_ms(1);
 	LCD_Reset(0);
@@ -185,109 +184,159 @@ void LCD_Init(void)
 	LCD_Reset(1);
 	delay_ms(10);
 
+	// 软件复位
+	LCD_WR_REG(0x01);
+	delay_ms(200);
+
 	
-	LCD_WR_REG(0xE0); 
-	LCD_WR_DATA(0x00); 
-	LCD_WR_DATA(0x09); 
-	LCD_WR_DATA(0x16); 
-	LCD_WR_DATA(0x0A); 
-	LCD_WR_DATA(0x1B); 
-	LCD_WR_DATA(0x0A); 
-	LCD_WR_DATA(0x41); 
-	LCD_WR_DATA(0x58); 
-	LCD_WR_DATA(0x50); 
-	LCD_WR_DATA(0x02); 
-	LCD_WR_DATA(0x08); 
-	LCD_WR_DATA(0x0D); 
-	LCD_WR_DATA(0x20); 
-	LCD_WR_DATA(0x24); 
-	LCD_WR_DATA(0x0f);  
+	// /* Positive Gamma Correction: 配置正向伽马曲线（亮部/中间灰阶） */
+	// LCD_WR_REG(0xE0); 
+	// LCD_WR_DATA(0x00); 
+	// LCD_WR_DATA(0x09); 
+	// LCD_WR_DATA(0x16); 
+	// LCD_WR_DATA(0x0A); 
+	// LCD_WR_DATA(0x1B); 
+	// LCD_WR_DATA(0x0A); 
+	// LCD_WR_DATA(0x41); 
+	// LCD_WR_DATA(0x58); 
+	// LCD_WR_DATA(0x50); 
+	// LCD_WR_DATA(0x02); 
+	// LCD_WR_DATA(0x08); 
+	// LCD_WR_DATA(0x0D); 
+	// LCD_WR_DATA(0x20); 
+	// LCD_WR_DATA(0x24); 
+	// LCD_WR_DATA(0x0f);  
 
-	LCD_WR_REG(0xE1); 
-	LCD_WR_DATA(0x00); 
-	LCD_WR_DATA(0x1B); 
-	LCD_WR_DATA(0x1E); 
-	LCD_WR_DATA(0x04); 
-	LCD_WR_DATA(0x0D); 
-	LCD_WR_DATA(0x02); 
-	LCD_WR_DATA(0x33); 
-	LCD_WR_DATA(0x23); 
-	LCD_WR_DATA(0x44); 
-	LCD_WR_DATA(0x03); 
-	LCD_WR_DATA(0x11); 
-	LCD_WR_DATA(0x0A); 
-	LCD_WR_DATA(0x30); 
-	LCD_WR_DATA(0x36); 
-	LCD_WR_DATA(0x0f); 
+	// /* Negative Gamma Correction: 配置负向伽马曲线（暗部/反向灰阶） */
+	// LCD_WR_REG(0xE1); 
+	// LCD_WR_DATA(0x00); 
+	// LCD_WR_DATA(0x1B); 
+	// LCD_WR_DATA(0x1E); 
+	// LCD_WR_DATA(0x04); 
+	// LCD_WR_DATA(0x0D); 
+	// LCD_WR_DATA(0x02); 
+	// LCD_WR_DATA(0x33); 
+	// LCD_WR_DATA(0x23); 
+	// LCD_WR_DATA(0x44); 
+	// LCD_WR_DATA(0x03); 
+	// LCD_WR_DATA(0x11); 
+	// LCD_WR_DATA(0x0A); 
+	// LCD_WR_DATA(0x30); 
+	// LCD_WR_DATA(0x36); 
+	// LCD_WR_DATA(0x0f); 
 
-	LCD_WR_REG(0XB0);  //Interface Mode Control  
-	LCD_WR_DATA(0x8A); //00
+	/* Interface Mode Control: 接口工作模式（MCU/SPI时序相关） */
+	// LCD_WR_REG(0XB0);  //Interface Mode Control  
+	// LCD_WR_DATA(0x8A); //00
 
-	LCD_WR_REG(0xB1);   //Frame rate 70HZ  
-	LCD_WR_DATA(0xA0); 
+	/* Frame Rate Control: 帧率参数（影响刷新速度与闪烁） */
+	// LCD_WR_REG(0xB1);   //Frame rate 70HZ  
+	// LCD_WR_DATA(0xA0); 
 
-	LCD_WR_REG(0xB4); 
-	LCD_WR_DATA(0x02);   
-
-	//LCD_WR_REG(0XB5);    
-	//LCD_WR_DATA(0x10); 
-	//LCD_WR_DATA(0x10); 
-	//LCD_WR_DATA(0x1A); 
-	//LCD_WR_DATA(0x80);
-
-	LCD_WR_REG(0x35); 
-	LCD_WR_DATA(0x00);   
-
-	LCD_WR_REG(0xC0); 
-	LCD_WR_DATA(0x10); 
-	LCD_WR_DATA(0x10); 
-
-	LCD_WR_REG(0xC1); 
-	LCD_WR_DATA(0x41); 
-
-	LCD_WR_REG(0xC5); 
-	LCD_WR_DATA(0x00); 
-	LCD_WR_DATA(0x30);   //0A
-	LCD_WR_DATA(0x80); 
-
-	LCD_WR_REG(0x36); 
-	LCD_WR_DATA(0x08); 
-
-	LCD_WR_REG(0x3A); //Interface Mode Control
-	LCD_WR_DATA(0x06);
-
-	LCD_WR_REG(0xB6); //RGB/MCU Interface Control
-	LCD_WR_DATA(0x02); //02
-	LCD_WR_DATA(0x02); 
-
-	LCD_WR_REG(0xB7); 
-	LCD_WR_DATA(0xC6); 
-
-	LCD_WR_REG(0XBE);
-	LCD_WR_DATA(0x00);
-	LCD_WR_DATA(0x04);
-
-	LCD_WR_REG(0xE9); 
-	LCD_WR_DATA(0x00);
-
-	LCD_WR_REG(0XF7);    
-	LCD_WR_DATA(0xA9); 
-	LCD_WR_DATA(0x51); 
-	LCD_WR_DATA(0x2C); 
-	LCD_WR_DATA(0x82);
+	/* Display Inversion Control: 显示反相控制 */
+	// LCD_WR_REG(0xB4); 
+	// LCD_WR_DATA(0x02);   
 
 
+	// /* Tearing Effect Line ON: 开启TE输出（用于同步撕裂控制） */
+	// LCD_WR_REG(0x35); 
+	// LCD_WR_DATA(0x00);   
+
+	// /* Power Control 1: 电源参数（内部电压/驱动能力） */
+	// LCD_WR_REG(0xC0); 
+	// LCD_WR_DATA(0x10); 
+	// LCD_WR_DATA(0x10); 
+
+	// /* Power Control 2: 次级电源参数 */
+	// LCD_WR_REG(0xC1); 
+	// LCD_WR_DATA(0x41); 
+
+	// /* VCOM Control: 共模电压参数（影响对比度与偏色） */
+	// LCD_WR_REG(0xC5); 
+	// LCD_WR_DATA(0x00); 
+	// LCD_WR_DATA(0x30);   //0A
+	// LCD_WR_DATA(0x80); 
+
+	/* Memory Access Control: 扫描方向/RGB-BGR顺序 */
+	// LCD_WR_REG(0x36); 
+	// LCD_WR_DATA(0x88); 
+
+	// /* Pixel Format Set: 像素格式，0x06常用于18-bit(6-6-6) */
+	// LCD_WR_REG(0x3A); //Interface Mode Control
+	// LCD_WR_DATA(0x06);
+
+	// /* Display Function Control: RGB/MCU接口与扫描相关参数 */
+	// LCD_WR_REG(0xB6); //RGB/MCU Interface Control
+	// LCD_WR_DATA(0x02); //02
+	// LCD_WR_DATA(0x02); 
+
+	/* Entry Mode Set: 刷新进入模式设置 */
+	// LCD_WR_REG(0xB7); 
+	// LCD_WR_DATA(0xC6); 
+
+	// /* HS Lanes Control(控制器相关): 面板接口细节参数 */
+	// LCD_WR_REG(0XBE);
+	// LCD_WR_DATA(0x00);
+	// LCD_WR_DATA(0x04);
+
+	// /* Set Image Function: 图像功能相关参数 */
+	// LCD_WR_REG(0xE9); 
+	// LCD_WR_DATA(0x00);
+
+	// /* Adjust Control 3: 厂商推荐的补偿参数 */
+	// LCD_WR_REG(0XF7);    
+	// LCD_WR_DATA(0xA9); 
+	// LCD_WR_DATA(0x51); 
+	// LCD_WR_DATA(0x2C); 
+	// LCD_WR_DATA(0x82);
+
+
+	/* Sleep Out: 退出睡眠，等待面板电源稳定 */
 	LCD_WR_REG(0x11); 
-	delay_ms(120); 
+	delay_ms(200); 
+	/* Display ON: 开启显示输出 */
 	LCD_WR_REG(0x29); 
 
-
-	LCD_Display_Dir(0);		 	//默认为竖屏
-	// LCD_BL=1;					//点亮背光
-	LCD_Clear(0xfc,0xfc,0xfc);
-	LCD_Clearx();
-	LCD_Clear(0x00,0x00,0x00);
+	// LCD_Display_Dir(0);		 	//默认为竖屏
+	// // LCD_BL=1;					//点亮背光
+	// LCD_Clear(0xfc,0xfc,0xfc);
+	// LCD_Clearx();
+	// LCD_Clear(0x00,0x00,0x00);
 }  
+
+void LCD_Init(void){
+	LCD_Driver_Init();		// 驱动层初始化，设置引脚模式
+
+	// 硬件复位（拉低RESET引脚 >10μs）
+	LCD_Reset(1);
+	delay_ms(1);
+	LCD_Reset(0);
+	delay_ms(80);
+	LCD_Reset(1);
+	delay_ms(1);					// 玄学问题，延时时间长不行，延时时间短可以，实测1ms最好
+
+	// 软件复位
+	// LCD_WR_REG(0x01);
+	// delay_ms(120);
+
+	// 退出睡眠模式
+	LCD_WR_REG(0x11);
+	delay_ms(120);
+
+
+	// 设置像素格式（18位）
+	LCD_WR_REG(0x3A);
+	LCD_WR_DATA(0x66);  // 0x55=16位, 0x66=18位
+
+	// 设置显示方向（0°旋转，RGB顺序）
+	LCD_WR_REG(0x36);
+	LCD_WR_DATA(0x48);  // 具体值参考MADCTL寄存器定义
+
+	// 开启显示
+	LCD_WR_REG(0x29);
+	delay_ms(120);
+}
+
 //清屏函数
 //color:要清屏的填充色
 void LCD_Clear(u8 r,u8 g,u8 b)
@@ -345,22 +394,34 @@ void LCD_Fill(u16 sx,u16 sy,u16 ex,u16 ey,u16 color)
 		LCD_WriteRAM_Prepare();     			//开始写入GRAM	  
 		for(j=0;j<xlen;j++)LCD_WriteRAM(color);	//设置光标位置 	    
 	}
-}  
-//在指定区域内填充指定颜色块			 
-//(sx,sy),(ex,ey):填充矩形对角坐标,区域大小为:(ex-sx+1)*(ey-sy+1)   
-//color:要填充的颜色
-void LCD_Color_Fill(u16 sx,u16 sy,u16 ex,u16 ey,u16 *color)
+} 
+
+void LCD_Flush(u16 sx,u16 sy,u16 ex,u16 ey, u8 *px_map)
 {  
 	u16 height,width;
-	u16 i,j;
 	width=ex-sx+1; 		//得到填充的宽度
 	height=ey-sy+1;		//高度
- 	for(i=0;i<height;i++)
-	{
- 		LCD_SetCursor(sx,sy+i);   	//设置光标位置 
-		LCD_WriteRAM_Prepare();     //开始写入GRAM
-		for(j=0;j<width;j++)LCD_WriteRAM(color[i*height+j]);//写入数据 
-	}	  
+	uint32_t totalpoint=width*height*3; 	//得到数据总数，假设每个像素占3字节（RGB888格式）
+	u8 col_buf[4];
+	u8 row_buf[4];
+
+	col_buf[0] = sx >> 8;
+	col_buf[1] = sx & 0xFF;
+	col_buf[2] = ex >> 8;
+	col_buf[3] = ex & 0xFF;
+	row_buf[0] = sy >> 8;
+	row_buf[1] = sy & 0xFF;
+	row_buf[2] = ey >> 8;
+	row_buf[3] = ey & 0xFF;
+
+	LCD_WR_REG(0x2a);  	// 列地址 (Column Address Set)
+
+	LCD_WR_DATA_buffer(col_buf, 4);
+	LCD_WR_REG(0x2b);		// 设置页地址 (Page Address Set)
+	LCD_WR_DATA_buffer(row_buf, 4);
+	LCD_WR_REG(0x2c);		// 存储器写入 (Memory Write)
+	LCD_WR_DATA_buffer(px_map, totalpoint); // 发送像素数据，假设每个像素占3字节（RGB888格式）
+ 
 }  
 //画线
 //x1,y1:起点坐标

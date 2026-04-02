@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "FreeRTOS.h"
 #include "task.h"
+#include "lvgl.h"
 
 // void vPortSVCHandler(void);
 // void xPortPendSVHandler(void);
@@ -201,7 +202,7 @@ void SysTick_Handler(void)
   {
     xPortSysTickHandler();
   }
-
+  lv_tick_inc(1);   // LVGL 心跳，每 1ms 增加 1
   /* USER CODE END SysTick_IRQn 1 */
 }
 

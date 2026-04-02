@@ -1,5 +1,6 @@
 // #include "spi.h"
 #include "lcd_driver.h"
+#include "stm32f1xx_hal_gpio.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F103开发板
@@ -92,15 +93,17 @@ u8 SPI1_ReadWriteByte(u8 TxData)
 
 void LCD_Driver_Init(void){
     __HAL_RCC_GPIOA_CLK_ENABLE();           	//开启GPIOA时钟
-	__HAL_RCC_GPIOB_CLK_ENABLE();           	//开启GPIOB时钟
+	// __HAL_RCC_GPIOB_CLK_ENABLE();           	//开启GPIOB时钟
 
     GPIO_InitTypeDef GPIO_Initure;
 	
-    GPIO_Initure.Pin=GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2; 				//PA0-2
+    GPIO_Initure.Pin=GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3; 				//PA0-2
     GPIO_Initure.Mode=GPIO_MODE_OUTPUT_PP;  	//推挽输出
-    GPIO_Initure.Pull=GPIO_NOPULL;          	//
+    GPIO_Initure.Pull=GPIO_PULLDOWN;          	//
     GPIO_Initure.Speed=GPIO_SPEED_FREQ_HIGH;    //高速
     HAL_GPIO_Init(GPIOA,&GPIO_Initure);
+
+    HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3,GPIO_PIN_SET);
 
     // SPI1_Init();                         //初始化SPI1
 }
@@ -133,7 +136,17 @@ void LCD_WR_DATA(u16 DATA)
 	
     HAL_SPI_Transmit(&hspi1, &tx, 1, 100);
 	LCD_CS=1;
-}		
+}
+
+void LCD_WR_DATA_buffer(u8 * pDATA, uint32_t size)
+{	
+	LCD_CS = 0;
+	
+	LCD_RS = 1;
+	
+    HAL_SPI_Transmit(&hspi1, pDATA, size, 100);
+	LCD_CS=1;
+}
 
 
 //LCD写GRAM

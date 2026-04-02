@@ -39,6 +39,7 @@ add_subdirectory(cmake/stm32cubemx)
 # add_subdirectory(cmake/user)
 add_subdirectory(FreeRTOS/FreeRTOS-Kernel)
 add_subdirectory(Hardware)
+add_subdirectory(LVGL)
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
@@ -69,6 +70,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
     FreeRTOS
     Hardware
+    LVGL
 
     # Add user defined libraries
 )
