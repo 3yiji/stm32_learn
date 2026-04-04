@@ -1,3 +1,4 @@
+#include "stm32f1xx_hal.h"
 #include "main.h"
 #include "led.h"
 #include "FreeRTOS.h"
@@ -7,6 +8,8 @@
 #include <string.h>
 #include "lv_port_disp.h"
 #include "delay.h"
+#include "stdio.h"
+#include "gt911.h"
 
 /* 任务函数：LED 闪烁 */
 void LED_Task(void *pvParameters)
@@ -18,29 +21,6 @@ void LED_Task(void *pvParameters)
         vTaskDelay(500);                       // 500ms 延时
         LED0=1;					//LED0灭
         vTaskDelay(500);                       // 500ms 延时
-    }
-}
-
-void LCD_Task(void *pvParameters)
-{
-    LCD_Init();
-    uint8_t color = 0;
-    uint8_t *line_buf;
-    while(1)
-    {
-
-        line_buf = pvPortMalloc(30 * 30 * 3);   // 申请内存
-        memset(line_buf, color, 30 * 30 * 3);
-        LCD_Flush(0,0,29,29, line_buf); // 刷新指定区域，使用申请的内存填充
-        vPortFree(line_buf); // 释放内存
-        vTaskDelay(1000);
-
-        line_buf = pvPortMalloc(30 * 30 * 3);   // 申请内存
-        memset(line_buf, color, 30 * 30 * 3);
-        LCD_Flush(100,100,129,129, line_buf); // 刷新指定区域，使用申请的内存填充
-        vPortFree(line_buf); // 释放内存
-        vTaskDelay(1000);
-        color += 20; // 改变颜色值，形成变化效果
     }
 }
 
@@ -80,9 +60,24 @@ void lvgl_timer_handler(void *pvParameters){
 	}
 }
 
+void test(void *pvParameters){
+    GT911_Init();
+    printf("result: %d\n", I2C_Scan_Addr());
+
+    // while(1){
+    //     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9, GPIO_PIN_RESET);
+    //     vTaskDelay(3000);
+    //     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9, GPIO_PIN_SET);
+    //     vTaskDelay(3000);
+    // }
+
+
+    vTaskDelete(NULL);
+}
+
 int mymain(void)
 {
-    delay_ms(1000); // 等待系统稳定
+    HAL_Delay(1000); // 等待系统稳定
 	// ------------- 创建任务 -------------
     xTaskCreate(
         LED_Task,       // 任务函数
@@ -93,15 +88,6 @@ int mymain(void)
         NULL            // 任务句柄
     );
 
-    // xTaskCreate(
-    //     LCD_Task,       // 任务函数
-    //     "LCD_Task",     // 任务名
-    //     2048,            // 栈大小
-    //     NULL,           // 参数
-    //     1,              // 优先级
-    //     NULL            // 任务句柄
-    // );
-
     xTaskCreate(
         lvgl_timer_handler, // 任务函数
         "LVGL_Timer",       // 任务名
@@ -109,6 +95,15 @@ int mymain(void)
         NULL,               // 参数
         2,                  // 优先级
         NULL                // 任务句柄
+    );
+
+    xTaskCreate(
+        test,       // 任务函数
+        "test",     // 任务名
+        256,            // 栈大小
+        NULL,           // 参数
+        1,              // 优先级
+        NULL            // 任务句柄
     );
 
     // ------------- 启动 FreeRTOS 调度器 -------------
@@ -122,4 +117,12 @@ void vApplicationMallocFailedHook(void)
   while (1)
   {
   }
+}
+
+extern UART_HandleTypeDef huart3;
+
+int __io_putchar(int ch)
+{
+  HAL_UART_Transmit(&huart3, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+  return ch;
 }

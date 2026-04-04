@@ -12,6 +12,7 @@ set(Hardware_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/Src/lcd.c
     # ${CMAKE_CURRENT_SOURCE_DIR}/Src/lcd_driver_gpio.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Src/lcd_driver_spi1.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Src/gt911.c
 
 )
 add_library(Hardware STATIC)
