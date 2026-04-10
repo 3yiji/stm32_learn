@@ -64,12 +64,32 @@ void test(void *pvParameters){
     GT911_Init();
     printf("result: %d\n", I2C_Scan_Addr());
 
-    // while(1){
-    //     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9, GPIO_PIN_RESET);
-    //     vTaskDelay(3000);
-    //     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9, GPIO_PIN_SET);
-    //     vTaskDelay(3000);
-    // }
+    uint8_t * temp_buf = pvPortMalloc(200);
+    if (temp_buf == NULL)
+    {
+        printf("temp_buf alloc failed\n");
+        vTaskDelete(NULL);
+    }
+
+    GT911_ReadReg(GT_CFGS_REG, temp_buf, 184);
+    printf("CFGS:");
+    for (int i = 0; i < 184; i++)
+    {
+        if ((i % 16) == 0)
+        {
+            printf("\n");
+        }
+        printf("%02X ", temp_buf[i]);
+    }
+    printf("\n");
+    vPortFree(temp_buf);
+
+    uint8_t temp = 0x00;
+    printf("result2: %d\n", GT911_WriteReg(GT_CTRL_REG, &temp, 1));
+    while(1){
+        vTaskDelay(3000);
+        GT911_Callback();
+    }
 
 
     vTaskDelete(NULL);
@@ -88,14 +108,14 @@ int mymain(void)
         NULL            // 任务句柄
     );
 
-    xTaskCreate(
-        lvgl_timer_handler, // 任务函数
-        "LVGL_Timer",       // 任务名
-        2048,                // 栈大小
-        NULL,               // 参数
-        2,                  // 优先级
-        NULL                // 任务句柄
-    );
+    // xTaskCreate(
+    //     lvgl_timer_handler, // 任务函数
+    //     "LVGL_Timer",       // 任务名
+    //     2048,                // 栈大小
+    //     NULL,               // 参数
+    //     2,                  // 优先级
+    //     NULL                // 任务句柄
+    // );
 
     xTaskCreate(
         test,       // 任务函数
