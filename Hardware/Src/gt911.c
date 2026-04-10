@@ -3,6 +3,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "stm32f1xx_hal_gpio.h"
+#include "FreeRTOS.h"
 
 // GT911驱动配置，默认使用第一份配置文件，如果屏幕异常，可尝试使用第二份
 #if  1
@@ -277,7 +278,7 @@ void GT911_Reset(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-    // HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);               // 先停止这个中断，避免在复位过程中被触发
+    HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);               // 先停止这个中断，避免在复位过程中被触发
     GPIO_InitStruct.Pin = GT911_INT_pin;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;         // 推挽输出模式
     GPIO_InitStruct.Pull = GPIO_PULLUP;
@@ -288,18 +289,18 @@ void GT911_Reset(void)
     GT911_INT_state(GPIO_PIN_RESET);                        // 将RST引脚拉低，开始复位
     delay_ms(20);
     GT911_RST_state(GPIO_PIN_RESET);                        
-    GT911_INT_state(GPIO_PIN_SET); 
+    GT911_INT_state(GPIO_PIN_RESET); 
     delay_ms(20);                                        // 等待20ms，确保GT911完成复位
     GT911_RST_state(GPIO_PIN_SET);                        
-    GT911_INT_state(GPIO_PIN_SET); 
+    GT911_INT_state(GPIO_PIN_RESET); 
     delay_ms(20); 
     GT911_RST_state(GPIO_PIN_SET);                        
     GT911_INT_state(GPIO_PIN_RESET);
     delay_ms(200);
 
     GPIO_InitStruct.Pin = GT911_INT_pin;                    // 重新配置回中断模式
-    // GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+    // GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GT911_INT_port, &GPIO_InitStruct);
     HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);                // 启用中断
@@ -342,17 +343,17 @@ void GT911_Init(void)
         // temp[1] = GT911_WriteReg(GT_CHECK_REG, &checksum, 1);
         // temp[2] = GT911_WriteReg(GT_FRESH_REG, CTP_CFG_GT911+185, 1);
 
-		GT911_ReadReg(GT_CFGS_REG,temp,186);//读取GT_CFGS_REG寄存器
-        printf("CFGS:");
-        for (int i = 0; i < 186; i++)
-        {
-            if ((i % 10) == 0)
-            {
-                printf("\n");
-            }
-            printf("%02X ", temp[i]);
-        }
-        printf("\n");
+		// GT911_ReadReg(GT_CFGS_REG,temp,186);//读取GT_CFGS_REG寄存器
+        // printf("CFGS:");
+        // for (int i = 0; i < 186; i++)
+        // {
+        //     if ((i % 10) == 0)
+        //     {
+        //         printf("\n");
+        //     }
+        //     printf("%02X ", temp[i]);
+        // }
+        // printf("\n");
 		delay_ms(10);
 		temp[0]=0X00;	 
 		GT911_WriteReg(GT_CTRL_REG,temp,1);//结束复位   
@@ -448,22 +449,24 @@ err:
 void GT911_Callback()
 {
     uint8_t touch_status;
-    uint8_t touch_data[20];
-    uint8_t temp = GT911_ReadReg(0x814E, &touch_status, 1);
+    uint8_t * touch_data;
+    touch_data = pvPortMalloc(40);
+    uint8_t temp = GT911_ReadReg(GT_GSTID_REG, &touch_status, 1);
     printf("GT911_ReadReg(0x814E) result: %d, touch_status: 0x%02X\n", temp, touch_status);
     if (touch_status & 0x80)
     {
-        // GT911_ReadReg(0x8150, touch_data, 20);
+        GT911_ReadReg(GT_TPD_Sta, touch_data, 40);
         // 处理触摸数据
         for (int i = 0; i < (touch_status & 0x0F); i++)
         {
-            uint16_t x = (touch_data[i * 4 + 1] << 8) | touch_data[i * 4];
-            uint16_t y = (touch_data[i * 4 + 3] << 8) | touch_data[i * 4 + 2];
+            uint16_t x = (touch_data[i * 8 + 1] << 8) | touch_data[i * 8];
+            uint16_t y = (touch_data[i * 8 + 3] << 8) | touch_data[i * 8 + 2];
             // 可以在这里进行触摸坐标的处理
             printf("Touch %d: x=%d, y=%d\n", i, x, y);
         }
         // 清除标志位
         touch_status = 0;
-        GT911_WriteReg(0x814E, &touch_status, 1);
+        GT911_WriteReg(GT_GSTID_REG, &touch_status, 1);
     }
+    vPortFree(touch_data);
 }

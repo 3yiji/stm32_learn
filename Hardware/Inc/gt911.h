@@ -17,7 +17,7 @@
 #define I2C_SDA_Port        GPIOB
 #define I2C_SDA_Pin         GPIO_PIN_7
 
-#define GT911_I2C_ADDR      0x14 // GT911的I2C地址，取决于GT911的INT引脚连接方式
+#define GT911_I2C_ADDR      0x5d // GT911的I2C地址，取决于GT911的INT引脚连接方式
 
 #define I2C_DELAY                20 // I2C每个Bit之间的延时时间，延时越小I2C的速率越高
 #define I2C_SCL_LOW          HAL_GPIO_WritePin(I2C_SCL_Port,I2C_SCL_Pin, GPIO_PIN_RESET) // I2C SCL脚输出0
