@@ -18,8 +18,10 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-# Set the project name
-set(CMAKE_PROJECT_NAME FreeRTOS_Learn)
+# Set the project name from current source directory name
+get_filename_component(CMAKE_PROJECT_NAME "${CMAKE_SOURCE_DIR}" NAME)
+# Sanitize to keep target/project name portable across toolchains
+# string(REGEX REPLACE "[^A-Za-z0-9_]" "_" CMAKE_PROJECT_NAME "${CMAKE_PROJECT_NAME}")
 
 # Enable compile command to ease indexing with e.g. clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)

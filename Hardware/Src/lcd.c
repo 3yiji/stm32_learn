@@ -331,7 +331,7 @@ void LCD_Init(void){
 	// 设置显示方向（0°旋转，RGB顺序）
 	LCD_WR_REG(0x36);
 	// LCD_WR_DATA(0x48);  // 具体值参考MADCTL寄存器定义
-	LCD_WR_DATA(0x80);  // 具体值参考MADCTL寄存器定义
+	LCD_WR_DATA(0x40);  // 具体值参考MADCTL寄存器定义
 
 	// 开启显示
 	LCD_WR_REG(0x29);
@@ -405,6 +405,7 @@ void LCD_Flush(u16 sx,u16 sy,u16 ex,u16 ey, u8 *px_map)
 	uint32_t totalpoint=width*height*3; 	//得到数据总数，假设每个像素占3字节（RGB888格式）
 	u8 col_buf[4];
 	u8 row_buf[4];
+	uint8_t temp;
 
 	col_buf[0] = sx >> 8;
 	col_buf[1] = sx & 0xFF;
@@ -415,12 +416,16 @@ void LCD_Flush(u16 sx,u16 sy,u16 ex,u16 ey, u8 *px_map)
 	row_buf[2] = ey >> 8;
 	row_buf[3] = ey & 0xFF;
 
-	LCD_WR_REG(0x2a);  	// 列地址 (Column Address Set)
-
+	temp = 0x2a;  	// 列地址 (Column Address Set)
+	LCD_WR_REG_buffer(&temp, 1);  	// 列地址 (Column Address Set)
 	LCD_WR_DATA_buffer(col_buf, 4);
-	LCD_WR_REG(0x2b);		// 设置页地址 (Page Address Set)
+	
+	temp = 0x2b;  	// 行地址 (Page Address Set)
+	LCD_WR_REG_buffer(&temp, 1);		// 设置页地址 (Page Address Set)
 	LCD_WR_DATA_buffer(row_buf, 4);
-	LCD_WR_REG(0x2c);		// 存储器写入 (Memory Write)
+	
+	temp = 0x2c;		// 存储器写入 (Memory Write)
+	LCD_WR_REG_buffer(&temp, 1);		// 存储器写入 (Memory Write)
 	LCD_WR_DATA_buffer(px_map, totalpoint); // 发送像素数据，假设每个像素占3字节（RGB888格式）
  
 }  

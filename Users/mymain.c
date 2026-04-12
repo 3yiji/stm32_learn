@@ -5,11 +5,13 @@
 #include "task.h"
 #include "lcd.h"
 #include "lvgl.h"
+#include "demos/lv_demos.h"
 #include <string.h>
 #include "lv_port_disp.h"
 #include "delay.h"
 #include "stdio.h"
 #include "gt911.h"
+#include "lv_port_indev.h"
 
 /* 任务函数：LED 闪烁 */
 void LED_Task(void *pvParameters)
@@ -27,42 +29,50 @@ void LED_Task(void *pvParameters)
 void lvgl_timer_handler(void *pvParameters){
     lv_init();
 	lv_port_disp_init();
-	// 1. 获取当前活动屏幕（默认屏幕）
-	lv_obj_t * scr = lv_scr_act();
+    lv_port_indev_init();
+	// // 1. 获取当前活动屏幕（默认屏幕）
+	// lv_obj_t * scr = lv_scr_act();
 
-	// 画个标签：居中显示
-	lv_obj_t * label = lv_label_create(scr);
-	lv_label_set_text(label, "HELLO STM32");
-	lv_obj_set_style_text_font(label, &lv_font_montserrat_14, 0); 
-	lv_obj_center(label); // 居中
+	// // 画个标签：居中显示
+	// lv_obj_t * label = lv_label_create(scr);
+	// lv_label_set_text(label, "HELLO STM32");
+	// lv_obj_set_style_text_font(label, &lv_font_montserrat_14, 0); 
+	// lv_obj_center(label); // 居中
 
-	// 再画个标签：放在屏幕左上角 (50, 100)
-	lv_obj_t * label1 = lv_label_create(scr);
-	lv_label_set_text(label1, "HELLO LVGL");
-	lv_obj_set_style_text_font(label1, &lv_font_montserrat_14, 0);
-	lv_obj_set_pos(label1, 100, 100); // 绝对定位到 (50,100)
+	// // 再画个标签：放在屏幕左上角 (50, 100)
+	// lv_obj_t * label1 = lv_label_create(scr);
+	// lv_label_set_text(label1, "HELLO LVGL");
+	// lv_obj_set_style_text_font(label1, &lv_font_montserrat_14, 0);
+	// lv_obj_set_pos(label1, 100, 100); // 绝对定位到 (50,100)
 	
-	// 画个方块
-	lv_obj_t * test_rect = lv_obj_create(lv_scr_act());
-	lv_obj_set_size(test_rect, 50, 50);
-	lv_obj_set_style_bg_color(test_rect, lv_palette_main(LV_PALETTE_RED), 0);
-	lv_obj_align(test_rect, LV_ALIGN_TOP_LEFT, 0, 0);
+	// // 画个方块
+	// lv_obj_t * test_rect = lv_obj_create(lv_scr_act());
+	// lv_obj_set_size(test_rect, 50, 50);
+	// lv_obj_set_style_bg_color(test_rect, lv_palette_main(LV_PALETTE_RED), 0);
+	// lv_obj_align(test_rect, LV_ALIGN_TOP_LEFT, 0, 0);
 	
-	// 再画一个
-	lv_obj_t * test_rect1 = lv_obj_create(lv_scr_act());
-	lv_obj_set_size(test_rect1, 60, 60);
-	lv_obj_set_style_bg_color(test_rect1, lv_palette_main(LV_PALETTE_YELLOW), 0);
-	lv_obj_align(test_rect1, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+	// // 再画一个
+	// lv_obj_t * test_rect1 = lv_obj_create(lv_scr_act());
+	// lv_obj_set_size(test_rect1, 60, 60);
+	// lv_obj_set_style_bg_color(test_rect1, lv_palette_main(LV_PALETTE_YELLOW), 0);
+	// lv_obj_align(test_rect1, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+
+    #if LV_USE_DEMO_STRESS
+        lv_demo_stress();
+    #endif
+    // #if LV_USE_DEMO_RENDER
+    //     lv_demo_render(LV_DEMO_RENDER_SCENE_FILL, LV_OPA_COVER);
+    // #endif
 
 	while(1){
         lv_task_handler(); // 处理 LVGL 任务
-		vTaskDelay(10); // 每 10ms 调用一次，确保 LVGL 的动画和事件处理正常
+		vTaskDelay(5); // 每 10ms 调用一次，确保 LVGL 的动画和事件处理正常
 	}
 }
 
 void test(void *pvParameters){
-    GT911_Init();
-    printf("result: %d\n", I2C_Scan_Addr());
+    // GT911_Init();
+    // printf("result: %d\n", I2C_Scan_Addr());
 
     // uint8_t * temp_buf = pvPortMalloc(200);
     // if (temp_buf == NULL)

@@ -138,14 +138,51 @@ void LCD_WR_DATA(u16 DATA)
 	LCD_CS=1;
 }
 
-void LCD_WR_DATA_buffer(u8 * pDATA, uint32_t size)
+// void LCD_WR_REG_buffer(u8 * pDATA, uint32_t size)
+// {	
+// 	LCD_RS = 0;
+//     HAL_SPI_Transmit(&hspi1, pDATA, size, 100);
+// }
+
+// void LCD_WR_DATA_buffer(u8 * pDATA, uint32_t size)
+// {	
+//     LCD_RS = 1;
+//     HAL_SPI_Transmit(&hspi1, pDATA, size, 100);
+// }
+
+
+// ====================== DMA 版本 ======================
+static void LCD_SPI_Wait_DMA(void)
+{
+    // 等待 SPI 状态空闲
+    while (HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY);
+    
+    // 等待 DMA TX 空闲
+    while (HAL_DMA_GetState(hspi1.hdmatx) != HAL_DMA_STATE_READY);
+}
+
+void LCD_WR_REG_buffer(u8 *pDATA, uint32_t size)
 {	
-	LCD_CS = 0;
-	
-	LCD_RS = 1;
-	
-    HAL_SPI_Transmit(&hspi1, pDATA, size, 100);
-	LCD_CS=1;
+    // 1. 等待上一次传输结束（保证不冲突）
+    LCD_SPI_Wait_DMA();
+    
+    // 2. 配置指令模式
+    LCD_RS = 0;
+    
+    // 3. DMA 非阻塞发送
+    HAL_SPI_Transmit_DMA(&hspi1, pDATA, size);
+}
+
+void LCD_WR_DATA_buffer(u8 *pDATA, uint32_t size)
+{	
+    // 1. 等待上一次传输结束（保证不冲突）
+    LCD_SPI_Wait_DMA();
+    
+    // 2. 配置数据模式
+    LCD_RS = 1;
+    
+    // 3. DMA 非阻塞发送
+    HAL_SPI_Transmit_DMA(&hspi1, pDATA, size);
 }
 
 
