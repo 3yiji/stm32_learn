@@ -1,4 +1,3 @@
-#include "stm32f1xx_hal.h"
 #include "main.h"
 #include "led.h"
 #include "FreeRTOS.h"
@@ -20,13 +19,15 @@ void LED_Task(void *pvParameters)
     while(1)
     {
         LED0=0;			     	//LED0亮
+        // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET); // PA1 置0，LED亮
         vTaskDelay(500);                       // 500ms 延时
         LED0=1;					//LED0灭
+        // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET); // PA1 置1，LED灭
         vTaskDelay(500);                       // 500ms 延时
     }
 }
 
-void lvgl_timer_handler(void *pvParameters){
+void lvgl_draw(void *pvParameters){
     lv_init();
 	lv_port_disp_init();
     lv_port_indev_init();
@@ -57,50 +58,45 @@ void lvgl_timer_handler(void *pvParameters){
 	// lv_obj_set_style_bg_color(test_rect1, lv_palette_main(LV_PALETTE_YELLOW), 0);
 	// lv_obj_align(test_rect1, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
 
-    #if LV_USE_DEMO_STRESS
-        lv_demo_stress();
-    #endif
+    // #if LV_USE_DEMO_STRESS
+    //     /* 设为横屏：顺时针 90 度 */
+    //     // lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_90);
+    //     lv_demo_stress();
+    // #endif
     // #if LV_USE_DEMO_RENDER
     //     lv_demo_render(LV_DEMO_RENDER_SCENE_FILL, LV_OPA_COVER);
     // #endif
 
+	/* 只创建一个对象，后续仅改颜色，避免反复申请释放内存 */
+    lv_obj_t * test_rect = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(test_rect, 320, 480);
+    lv_obj_align(test_rect, LV_ALIGN_TOP_LEFT, 0, 0);
+
+    const lv_palette_t test_colors[] = {
+        LV_PALETTE_RED,
+        LV_PALETTE_GREEN,
+        LV_PALETTE_BLUE,
+    };
+    uint32_t color_idx = 0;
+    TickType_t last_switch_tick = xTaskGetTickCount();
+    lv_obj_set_style_bg_color(test_rect, lv_palette_main(test_colors[color_idx]), 0);
+
 	while(1){
-        lv_task_handler(); // 处理 LVGL 任务
-		vTaskDelay(5); // 每 10ms 调用一次，确保 LVGL 的动画和事件处理正常
+        /* 单任务串行调用 LVGL，避免并发访问导致随机异常 */
+        lv_timer_handler();
+
+        TickType_t now = xTaskGetTickCount();
+        if((now - last_switch_tick) >= pdMS_TO_TICKS(2000)) {
+            color_idx = (color_idx + 1U) % (sizeof(test_colors) / sizeof(test_colors[0]));
+            lv_obj_set_style_bg_color(test_rect, lv_palette_main(test_colors[color_idx]), 0);
+            last_switch_tick = now;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(5));
 	}
 }
 
 void test(void *pvParameters){
-    // GT911_Init();
-    // printf("result: %d\n", I2C_Scan_Addr());
-
-    // uint8_t * temp_buf = pvPortMalloc(200);
-    // if (temp_buf == NULL)
-    // {
-    //     printf("temp_buf alloc failed\n");
-    //     vTaskDelete(NULL);
-    // }
-
-    // GT911_ReadReg(GT_CFGS_REG, temp_buf, 184);
-    // printf("CFGS:");
-    // for (int i = 0; i < 184; i++)
-    // {
-    //     if ((i % 16) == 0)
-    //     {
-    //         printf("\n");
-    //     }
-    //     printf("%02X ", temp_buf[i]);
-    // }
-    // printf("\n");
-    // vPortFree(temp_buf);
-
-    // uint8_t temp = 0x00;
-    // printf("result2: %d\n", GT911_WriteReg(GT_CTRL_REG, &temp, 1));
-    // while(1){
-    //     vTaskDelay(3000);
-    //     GT911_Callback();
-    // }
-
 
     vTaskDelete(NULL);
 }
@@ -119,22 +115,22 @@ int mymain(void)
     );
 
     xTaskCreate(
-        lvgl_timer_handler, // 任务函数
-        "LVGL_Timer",       // 任务名
-        2048,                // 栈大小
+        lvgl_draw, // 任务函数
+        "LVGL_Draw",       // 任务名
+        1024*3,                // 栈大小
         NULL,               // 参数
-        2,                  // 优先级
+        1,                  // 优先级
         NULL                // 任务句柄
     );
 
-    xTaskCreate(
-        test,       // 任务函数
-        "test",     // 任务名
-        256,            // 栈大小
-        NULL,           // 参数
-        1,              // 优先级
-        NULL            // 任务句柄
-    );
+    // xTaskCreate(
+    //     test,       // 任务函数
+    //     "test",     // 任务名
+    //     256,            // 栈大小
+    //     NULL,           // 参数
+    //     1,              // 优先级
+    //     NULL            // 任务句柄
+    // );
 
     // ------------- 启动 FreeRTOS 调度器 -------------
     vTaskStartScheduler();
@@ -149,10 +145,10 @@ void vApplicationMallocFailedHook(void)
   }
 }
 
-extern UART_HandleTypeDef huart3;
+extern UART_HandleTypeDef huart1;
 
 int __io_putchar(int ch)
 {
-  HAL_UART_Transmit(&huart3, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
   return ch;
 }

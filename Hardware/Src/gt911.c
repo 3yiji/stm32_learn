@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include "stdio.h"
 #include "string.h"
-#include "stm32f1xx_hal_gpio.h"
 #include "FreeRTOS.h"
 
 // GT911驱动配置，默认使用第一份配置文件，如果屏幕异常，可尝试使用第二份

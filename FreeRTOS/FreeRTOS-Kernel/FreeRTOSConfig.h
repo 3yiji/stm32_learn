@@ -1,7 +1,7 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include "stm32f1xx_hal.h"
+#include "stm32f4xx_hal.h"
 
 #define configUSE_PREEMPTION                        1                           // 1=抢占式调度，优先级高的任务可抢占低优先级任务
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION    0                           // 任务选择优化开关，Cortex-M3通常关闭即可
@@ -9,11 +9,11 @@
 #define configUSE_16_BIT_TICKS                      0                           // 0=使用32位tick计数，避免tick溢出过快
 #define configIDLE_SHOULD_YIELD                     1                           // 空闲任务在同优先级有就绪任务时主动让出CPU
 
-#define configCPU_CLOCK_HZ                          72000000UL                  // CPU主频72MHz（HSE 8MHz * PLL x9）
+#define configCPU_CLOCK_HZ                          168000000UL                 // CPU主频168MHz（HSE 8MHz * PLL x42）
 #define configTICK_RATE_HZ                          1000U                       // 系统节拍1kHz，即1ms一次tick中断
 #define configMAX_PRIORITIES                        8                           // 可用任务优先级数量（0~7）
 #define configMINIMAL_STACK_SIZE                    128U                        // 空闲任务最小栈深度（单位：word，不是字节）
-#define configTOTAL_HEAP_SIZE                       (16U * 1024U)               // heap_4可用堆大小，单位字节
+#define configTOTAL_HEAP_SIZE                       (32U * 1024U)               // heap_4可用堆大小，单位字节
 #define configMAX_TASK_NAME_LEN                     16                          // 任务名最大长度（含结尾\0）
 #define configTIMER_TASK_PRIORITY                   (configMAX_PRIORITIES - 1)  // 软件定时器服务任务优先级
 #define configTIMER_QUEUE_LENGTH                    10                          // 软件定时器命令队列长度

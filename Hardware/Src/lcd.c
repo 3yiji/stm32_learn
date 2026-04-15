@@ -306,6 +306,7 @@ void LCD_Init2(void)
 
 void LCD_Init(void){
 	LCD_Driver_Init();		// 驱动层初始化，设置引脚模式
+	uint8_t temp;
 
 	// 硬件复位（拉低RESET引脚 >10μs）
 	LCD_Reset(1);
@@ -313,28 +314,34 @@ void LCD_Init(void){
 	LCD_Reset(0);
 	delay_ms(80);
 	LCD_Reset(1);
-	delay_ms(1);					// 玄学问题，延时时间长不行，延时时间短可以，实测1ms最好
+	delay_ms(100);					// 玄学问题，延时时间长不行，延时时间短可以，实测1ms最好
 
 	// 软件复位
 	// LCD_WR_REG(0x01);
 	// delay_ms(120);
 
 	// 退出睡眠模式
-	LCD_WR_REG(0x11);
+	temp = 0x11;
+	LCD_WR_REG_buffer(&temp, 1);
 	delay_ms(120);
 
 
 	// 设置像素格式（18位）
-	LCD_WR_REG(0x3A);
-	LCD_WR_DATA(0x66);  // 0x55=16位, 0x66=18位
+	temp = 0x3A;
+	LCD_WR_REG_buffer(&temp, 1);
+	temp = 0x55;
+	LCD_WR_DATA_buffer(&temp, 1);  // 0x55=16位, 0x66=18位
 
 	// 设置显示方向（0°旋转，RGB顺序）
-	LCD_WR_REG(0x36);
+	temp = 0x36;
+	LCD_WR_REG_buffer(&temp, 1);
 	// LCD_WR_DATA(0x48);  // 具体值参考MADCTL寄存器定义
-	LCD_WR_DATA(0x40);  // 具体值参考MADCTL寄存器定义
+	temp = 0x48;
+	LCD_WR_DATA_buffer(&temp, 1);  // 具体值参考MADCTL寄存器定义
 
 	// 开启显示
-	LCD_WR_REG(0x29);
+	temp = 0x29;
+	LCD_WR_REG_buffer(&temp, 1);
 	delay_ms(120);
 }
 
@@ -402,7 +409,7 @@ void LCD_Flush(u16 sx,u16 sy,u16 ex,u16 ey, u8 *px_map)
 	u16 height,width;
 	width=ex-sx+1; 		//得到填充的宽度
 	height=ey-sy+1;		//高度
-	uint32_t totalpoint=width*height*3; 	//得到数据总数，假设每个像素占3字节（RGB888格式）
+	uint32_t totalpoint=width*height*2; 	//得到数据总数，假设每个像素占2字节（RGB565格式）
 	u8 col_buf[4];
 	u8 row_buf[4];
 	uint8_t temp;
@@ -426,7 +433,7 @@ void LCD_Flush(u16 sx,u16 sy,u16 ex,u16 ey, u8 *px_map)
 	
 	temp = 0x2c;		// 存储器写入 (Memory Write)
 	LCD_WR_REG_buffer(&temp, 1);		// 存储器写入 (Memory Write)
-	LCD_WR_DATA_buffer(px_map, totalpoint); // 发送像素数据，假设每个像素占3字节（RGB888格式）
+	LCD_WR_GRAM_buffer(px_map, totalpoint); // 发送像素数据，假设每个像素占2字节（RGB565格式）
  
 }  
 //画线

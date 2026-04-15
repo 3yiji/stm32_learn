@@ -2,7 +2,7 @@
 #define __GT911_H	
 // #include "stm32f1xx_hal.h"
 #include "delay.h"
-#include "stm32f1xx.h"
+#include "stm32_target_hal.h"
 
 #define delay_ms(ms) HAL_Delay(ms)
 

@@ -14,7 +14,7 @@
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 	
 
-#define LED0 PCout(13)   	//LED0
+#define LED0 PAout(1)   	//LED0
 
 void LED_Init(void);
 #endif

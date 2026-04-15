@@ -1,6 +1,6 @@
 #ifndef __SYS_H
 #define __SYS_H	
-#include "stm32f1xx.h"
+#include "stm32_target_hal.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32开发板		   
@@ -57,21 +57,29 @@ typedef __I uint8_t vuc8;
 #define MEM_ADDR(addr)  *((volatile unsigned long  *)(addr)) 
 #define BIT_ADDR(addr, bitnum)   MEM_ADDR(BITBAND(addr, bitnum)) 
 //IO口地址映射
-#define GPIOA_ODR_Addr    (GPIOA_BASE+12) //0x4001080C 
-#define GPIOB_ODR_Addr    (GPIOB_BASE+12) //0x40010C0C 
-#define GPIOC_ODR_Addr    (GPIOC_BASE+12) //0x4001100C 
-#define GPIOD_ODR_Addr    (GPIOD_BASE+12) //0x4001140C 
-#define GPIOE_ODR_Addr    (GPIOE_BASE+12) //0x4001180C 
-#define GPIOF_ODR_Addr    (GPIOF_BASE+12) //0x40011A0C    
-#define GPIOG_ODR_Addr    (GPIOG_BASE+12) //0x40011E0C    
+#if defined(STM32_TARGET_FAMILY_F1)
+#define GPIO_ODR_OFFSET   0x0C
+#define GPIO_IDR_OFFSET   0x08
+#else
+#define GPIO_ODR_OFFSET   0x14
+#define GPIO_IDR_OFFSET   0x10
+#endif
 
-#define GPIOA_IDR_Addr    (GPIOA_BASE+8) //0x40010808 
-#define GPIOB_IDR_Addr    (GPIOB_BASE+8) //0x40010C08 
-#define GPIOC_IDR_Addr    (GPIOC_BASE+8) //0x40011008 
-#define GPIOD_IDR_Addr    (GPIOD_BASE+8) //0x40011408 
-#define GPIOE_IDR_Addr    (GPIOE_BASE+8) //0x40011808 
-#define GPIOF_IDR_Addr    (GPIOF_BASE+8) //0x40011A08 
-#define GPIOG_IDR_Addr    (GPIOG_BASE+8) //0x40011E08 
+#define GPIOA_ODR_Addr    (GPIOA_BASE+GPIO_ODR_OFFSET)
+#define GPIOB_ODR_Addr    (GPIOB_BASE+GPIO_ODR_OFFSET)
+#define GPIOC_ODR_Addr    (GPIOC_BASE+GPIO_ODR_OFFSET)
+#define GPIOD_ODR_Addr    (GPIOD_BASE+GPIO_ODR_OFFSET)
+#define GPIOE_ODR_Addr    (GPIOE_BASE+GPIO_ODR_OFFSET)
+#define GPIOF_ODR_Addr    (GPIOF_BASE+GPIO_ODR_OFFSET)
+#define GPIOG_ODR_Addr    (GPIOG_BASE+GPIO_ODR_OFFSET)
+
+#define GPIOA_IDR_Addr    (GPIOA_BASE+GPIO_IDR_OFFSET)
+#define GPIOB_IDR_Addr    (GPIOB_BASE+GPIO_IDR_OFFSET)
+#define GPIOC_IDR_Addr    (GPIOC_BASE+GPIO_IDR_OFFSET)
+#define GPIOD_IDR_Addr    (GPIOD_BASE+GPIO_IDR_OFFSET)
+#define GPIOE_IDR_Addr    (GPIOE_BASE+GPIO_IDR_OFFSET)
+#define GPIOF_IDR_Addr    (GPIOF_BASE+GPIO_IDR_OFFSET)
+#define GPIOG_IDR_Addr    (GPIOG_BASE+GPIO_IDR_OFFSET)
  
 //IO口操作,只对单一的IO口!
 //确保n的值小于16!
