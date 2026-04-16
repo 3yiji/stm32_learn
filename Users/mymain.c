@@ -11,6 +11,7 @@
 #include "stdio.h"
 #include "gt911.h"
 #include "lv_port_indev.h"
+#include "demos/widgets/lv_demo_widgets.h"
 
 /* 任务函数：LED 闪烁 */
 void LED_Task(void *pvParameters)
@@ -31,66 +32,12 @@ void lvgl_draw(void *pvParameters){
     lv_init();
 	lv_port_disp_init();
     lv_port_indev_init();
-	// // 1. 获取当前活动屏幕（默认屏幕）
-	// lv_obj_t * scr = lv_scr_act();
 
-	// // 画个标签：居中显示
-	// lv_obj_t * label = lv_label_create(scr);
-	// lv_label_set_text(label, "HELLO STM32");
-	// lv_obj_set_style_text_font(label, &lv_font_montserrat_14, 0); 
-	// lv_obj_center(label); // 居中
-
-	// // 再画个标签：放在屏幕左上角 (50, 100)
-	// lv_obj_t * label1 = lv_label_create(scr);
-	// lv_label_set_text(label1, "HELLO LVGL");
-	// lv_obj_set_style_text_font(label1, &lv_font_montserrat_14, 0);
-	// lv_obj_set_pos(label1, 100, 100); // 绝对定位到 (50,100)
-	
-	// // 画个方块
-	// lv_obj_t * test_rect = lv_obj_create(lv_scr_act());
-	// lv_obj_set_size(test_rect, 50, 50);
-	// lv_obj_set_style_bg_color(test_rect, lv_palette_main(LV_PALETTE_RED), 0);
-	// lv_obj_align(test_rect, LV_ALIGN_TOP_LEFT, 0, 0);
-	
-	// // 再画一个
-	// lv_obj_t * test_rect1 = lv_obj_create(lv_scr_act());
-	// lv_obj_set_size(test_rect1, 60, 60);
-	// lv_obj_set_style_bg_color(test_rect1, lv_palette_main(LV_PALETTE_YELLOW), 0);
-	// lv_obj_align(test_rect1, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
-
-    // #if LV_USE_DEMO_STRESS
-    //     /* 设为横屏：顺时针 90 度 */
-    //     // lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_90);
-    //     lv_demo_stress();
-    // #endif
-    // #if LV_USE_DEMO_RENDER
-    //     lv_demo_render(LV_DEMO_RENDER_SCENE_FILL, LV_OPA_COVER);
-    // #endif
-
-	/* 只创建一个对象，后续仅改颜色，避免反复申请释放内存 */
-    lv_obj_t * test_rect = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(test_rect, 320, 480);
-    lv_obj_align(test_rect, LV_ALIGN_TOP_LEFT, 0, 0);
-
-    const lv_palette_t test_colors[] = {
-        LV_PALETTE_RED,
-        LV_PALETTE_GREEN,
-        LV_PALETTE_BLUE,
-    };
-    uint32_t color_idx = 0;
-    TickType_t last_switch_tick = xTaskGetTickCount();
-    lv_obj_set_style_bg_color(test_rect, lv_palette_main(test_colors[color_idx]), 0);
+    lv_demo_widgets();
 
 	while(1){
         /* 单任务串行调用 LVGL，避免并发访问导致随机异常 */
         lv_timer_handler();
-
-        TickType_t now = xTaskGetTickCount();
-        if((now - last_switch_tick) >= pdMS_TO_TICKS(2000)) {
-            color_idx = (color_idx + 1U) % (sizeof(test_colors) / sizeof(test_colors[0]));
-            lv_obj_set_style_bg_color(test_rect, lv_palette_main(test_colors[color_idx]), 0);
-            last_switch_tick = now;
-        }
 
         vTaskDelay(pdMS_TO_TICKS(5));
 	}

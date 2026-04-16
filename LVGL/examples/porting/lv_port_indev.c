@@ -11,6 +11,7 @@
  *********************/
 #include "lv_port_indev.h"
 #include "gt911.h"
+#include <stdio.h>
 
 /*********************
  *      DEFINES
@@ -109,7 +110,7 @@ static void touchpad_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
         // 清除标志位
         touch_status = 0;
         GT911_WriteReg(GT_GSTID_REG, &touch_status, 1);
-        
+        printf("Touch at (%d, %d)\n", last_x, last_y);
         data->state = LV_INDEV_STATE_PRESSED;
     }
     else{

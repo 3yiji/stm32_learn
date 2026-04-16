@@ -6,16 +6,16 @@
 
 #define delay_ms(ms) HAL_Delay(ms)
 
-#define GT911_RST_state(state)          HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, state)
-#define GT911_INT_pin                   GPIO_PIN_5
+#define GT911_RST_state(state)          HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, state)
+#define GT911_INT_pin                   GPIO_PIN_12
 #define GT911_INT_port                  GPIOB
 #define GT911_INT_state(state)          HAL_GPIO_WritePin(GT911_INT_port, GT911_INT_pin, state)
 
 // 硬件接口
 #define I2C_SCL_Port        GPIOB
-#define I2C_SCL_Pin         GPIO_PIN_6
+#define I2C_SCL_Pin         GPIO_PIN_14
 #define I2C_SDA_Port        GPIOB
-#define I2C_SDA_Pin         GPIO_PIN_7
+#define I2C_SDA_Pin         GPIO_PIN_11
 
 #define GT911_I2C_ADDR      0x5d // GT911的I2C地址，取决于GT911的INT引脚连接方式
 

@@ -59,17 +59,14 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_1
 #define LED_GPIO_Port GPIOA
+#define I2C_SDA_Pin GPIO_PIN_11
+#define I2C_SDA_GPIO_Port GPIOB
+#define GT911_RST_Pin GPIO_PIN_13
+#define GT911_RST_GPIO_Port GPIOB
+#define I2C_CLK_Pin GPIO_PIN_14
+#define I2C_CLK_GPIO_Port GPIOB
 #define LCD_RST_Pin GPIO_PIN_3
 #define LCD_RST_GPIO_Port GPIOD
-#define GT911_INT_Pin GPIO_PIN_5
-#define GT911_INT_GPIO_Port GPIOB
-#define GT911_INT_EXTI_IRQn EXTI9_5_IRQn
-#define I2C_CLK_Pin GPIO_PIN_6
-#define I2C_CLK_GPIO_Port GPIOB
-#define I2C_SDA_Pin GPIO_PIN_7
-#define I2C_SDA_GPIO_Port GPIOB
-#define GT911_RST_Pin GPIO_PIN_8
-#define GT911_RST_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
